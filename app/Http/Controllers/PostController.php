@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
+use App\Http\Requests\PostUpdateRequest;
 use App\Models\Post;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 
 class PostController extends Controller
@@ -25,20 +24,12 @@ class PostController extends Controller
     public function postCreate(PostRequest $req)
     {
 
-
-        // Validator::make($req->all(), [
-        //     'title' => 'required',
-        //     'postImg' => 'required|mimes:jpg,png'
-        // ])->validate();
-
         $data = $this->getPostData($req);
 
         if ($req->hasFile('postImg')) {
             $fileName = uniqid() . $req->file('postImg')->getClientOriginalName();
-            $req->file('postImg')->storeAs('public/uploads',$fileName);
+            $req->file('postImg')->storeAs('public/uploads', $fileName);
             $data['postImg'] = $fileName;
-            // $img = $req->file('postImg')->store('public/uploads'); // auto genetate UUID from laravel 
-            // $data['postImg'] = $img;
         }
 
         Post::create($data);
@@ -48,7 +39,7 @@ class PostController extends Controller
     public function postDelete($id)
     {
         $image = Post::find($id);
-        unlink(storage_path('app/public/uploads/').$image->postImg);
+        Storage::delete($image->postImg);
         Post::where('id', $id)->delete();
         return redirect()->route('post#list');
     }
@@ -59,24 +50,17 @@ class PostController extends Controller
         return view('edit', compact('post'));
     }
 
-    public function postEdit(Request $req,$id)
+    public function postEdit(PostUpdateRequest $req, $id)
     {
-        Validator::make($req->all(), [
-            'title' => 'required',
-            'postImg' => 'nullable'
-        ])->validate();
-
-        
-        $updateData = $this->getPostData($req); //[title,postimg]
+        $updateData = $this->getPostData($req);
 
         if ($req->hasFile('postImg')) {
             $post = Post::find($id);
             Storage::delete($post->postImg);
-
-           $imagePath = $req->file('postImg')->store('public');
-           $updateData['postImg'] = $imagePath; 
+            $fileName = uniqid() . $req->file('postImg')->getClientOriginalName();
+            $req->file('postImg')->storeAs('public/uploads', $fileName);
+            $updateData['postImg'] = $fileName;
         }
-
 
         Post::where('id', $id)->update($updateData);
         return redirect()->route('post#list');

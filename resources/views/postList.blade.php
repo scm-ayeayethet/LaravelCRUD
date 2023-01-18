@@ -19,7 +19,7 @@
           <tr>
           <td>{{ $post['id'] }}</td>
           <td>{{ $post['title'] }}</td>
-          <td><img src="{{ Storage::url('uploads/'.$post['postImg']) }}" width='100' height="100" alt=""></td>
+          <td><img src="{{ Storage::url('uploads/'.$post['postImg']) }}" width='100' height="100"></td>
           <td>
           <a href='{{ url('post/edit/'.$post['id']) }}' class='edit' data-toggle='modal'>
              <button type='button' class='btn btn-success'>Edit</button>
@@ -29,8 +29,7 @@
            </a>
          </td>
         </tr>
-          @endforeach
-    
+          @endforeach 
     </tbody>
   </table>
 </div>
