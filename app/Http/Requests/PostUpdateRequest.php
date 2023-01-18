@@ -28,11 +28,4 @@ class PostUpdateRequest extends FormRequest
             'postImg' => 'nullable|mimes:jpg,png'
         ];
     }
-
-    public function messages(){
-        return [
-            'title.required' => 'Tile is required!!',
-            'postImg.mimes' =>  'Post image must be jpg or png type!!'
-        ];
-    }
 }

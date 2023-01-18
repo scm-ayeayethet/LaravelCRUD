@@ -1,8 +1,8 @@
 @extends('master')
 
 @section('content')
-<div class="wrapper mt-5 ms-3 me-2 py-3  ">
-  <a href="{{ route('post#create') }}" class="create" data-toggle="modal">
+<div class="wrapper mt-3 ms-3 me-2 py-3  ">
+  <a href="{{ route('post.create') }}" class="create" data-toggle="modal">
     <button type="button" class="btn btn-primary mb-3">Create</button>
   </a>
   <table class="table table-striped table-bordered">
@@ -17,14 +17,14 @@
     <tbody>
           @foreach ($posts as $post)
           <tr>
-          <td>{{ $post['id'] }}</td>
-          <td>{{ $post['title'] }}</td>
-          <td><img src="{{ Storage::url('uploads/'.$post['postImg']) }}" width='100' height="100"></td>
+          <td>{{ $post->id }}</td>
+          <td>{{ $post->title }}</td>
+          <td><img src="{{ Storage::url('uploads/'.$post->postImg) }}" width='50' height="50"></td>
           <td>
-          <a href='{{ url('post/edit/'.$post['id']) }}' class='edit' data-toggle='modal'>
+          <a href='{{ route('post.edit',['id'=>$post->id]) }}' class='edit' data-toggle='modal'>
              <button type='button' class='btn btn-success'>Edit</button>
            </a>
-           <a href='{{ url('post/delete/'.$post['id']) }}' class='delete' data-toggle='modal'>
+           <a href='{{ route('post.destroy',['id'=>$post->id]) }}' class='delete' data-toggle='modal'>
              <button type='button' class='btn btn-danger'>Delete</button>
            </a>
          </td>
@@ -32,5 +32,8 @@
           @endforeach 
     </tbody>
   </table>
+  <div class="d-flex justify-content-center">
+    {!! $posts->links() !!}
+  </div>
 </div>
 @endsection

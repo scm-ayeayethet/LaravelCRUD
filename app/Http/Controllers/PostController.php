@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    public function getPost()
+    public function index()
     {
-        $posts = Post::all()->toArray();
+        $posts = Post::paginate(5);
+
         return view('postList', compact('posts'));
     }
 
@@ -21,55 +22,56 @@ class PostController extends Controller
         return view('create');
     }
 
-    public function postCreate(PostRequest $req)
+    public function store(PostRequest $request)
     {
 
-        $data = $this->getPostData($req);
+        $data = [
+            'title' => $request->title
+        ];
 
-        if ($req->hasFile('postImg')) {
-            $fileName = uniqid() . $req->file('postImg')->getClientOriginalName();
-            $req->file('postImg')->storeAs('public/uploads', $fileName);
+        if ($request->hasFile('postImg')) {
+            $fileName = uniqid() . $request->file('postImg')->getClientOriginalName();
+            $request->file('postImg')->storeAs('public/uploads', $fileName);
             $data['postImg'] = $fileName;
         }
 
         Post::create($data);
-        return redirect()->route('post#list');
+
+        return redirect()->route('post.index');
     }
 
-    public function postDelete($id)
+    public function destroy($id)
     {
-        $image = Post::find($id);
-        Storage::delete($image->postImg);
-        Post::where('id', $id)->delete();
-        return redirect()->route('post#list');
+        $post = Post::find($id);
+        Storage::delete($post->postImg);
+        $post->delete();
+
+        return back();
     }
 
     public function edit($id)
     {
-        $post = Post::where('id', $id)->first()->toArray();
+        $post = Post::find($id);
+
         return view('edit', compact('post'));
     }
 
-    public function postEdit(PostUpdateRequest $req, $id)
+    public function update(PostUpdateRequest $request, $id)
     {
-        $updateData = $this->getPostData($req);
+        $updateData = [
+            'title' => $request->title
+        ];
+        $post = Post::find($id);
 
-        if ($req->hasFile('postImg')) {
-            $post = Post::find($id);
+        if ($request->hasFile('postImg')) {
             Storage::delete($post->postImg);
-            $fileName = uniqid() . $req->file('postImg')->getClientOriginalName();
-            $req->file('postImg')->storeAs('public/uploads', $fileName);
+            $fileName = uniqid() . $request->file('postImg')->getClientOriginalName();
+            $request->file('postImg')->storeAs('public/uploads', $fileName);
             $updateData['postImg'] = $fileName;
         }
 
-        Post::where('id', $id)->update($updateData);
-        return redirect()->route('post#list');
-    }
+        $post->update($updateData);
 
-    private function getPostData($data)
-    {
-        return [
-            'title' => $data->title
-        ];
+        return redirect()->route('post.index');
     }
 }
