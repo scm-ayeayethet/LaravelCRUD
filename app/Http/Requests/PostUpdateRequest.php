@@ -32,7 +32,7 @@ class PostUpdateRequest extends FormRequest
     public function messages(){
         return [
             'title.required' => 'Tile is required!!',
-            'postImg.required' => 'Post image is required!!' 
+            'postImg.mimes' =>  'Post image must be jpg or png type!!'
         ];
     }
 }
